@@ -1,11 +1,11 @@
 import React from 'react';
 import { createContext, useReducer, useContext } from 'react';
 import { faker } from '@faker-js/faker';
-import { cartReducer } from './Reducer';
+import { cartReducer, productReducer } from './Reducers';
 
-const ShoppingCartContext = createContext();
+const CartContext = createContext();
 
-// faker.seed(100);
+faker.seed(100);
 
 const Context = ({ children }) => {
   const products = [...Array(20)].map(() => ({
@@ -18,21 +18,28 @@ const Context = ({ children }) => {
     ratings: faker.helpers.arrayElement([1, 2, 3, 4, 5]),
   }));
 
-  const initialState = {
+  //   const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(cartReducer, {
     products: products,
     cart: [],
-  };
+  });
 
-  //   const [state, dispatch] = useReducer(reducer, initialState);
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [productState, productDispatch] = useReducer(productReducer, {
+    byStock: false,
+    byFastDelivery: false,
+    byRating: 0,
+    searchQuery: '',
+  });
+
+  console.log(productState);
 
   // We share the state and the dispatch
-  return <ShoppingCartContext.Provider value={{ state, dispatch }}>{children}</ShoppingCartContext.Provider>;
+  return <CartContext.Provider value={{ state, dispatch, productState, productDispatch }}>{children}</CartContext.Provider>;
 };
 
 export default Context;
 
 // We export the State
-export const ShoppingCartState = () => {
-  return useContext(ShoppingCartContext);
+export const CartState = () => {
+  return useContext(CartContext);
 };
